@@ -2,29 +2,30 @@ bits 64
 
 global asc_semantic
 
-%define AST_PROGRAM       1
-%define AST_VARIABLE      2
-%define AST_CONSTANT      3
-%define AST_ASSIGNMENT    4
-%define AST_INTEGER       5
-%define AST_IDENTIFIER    6
-%define AST_BINARY        7
-%define AST_WHILE         8
+extern malloc
 
-%define TOKEN_PLUS        8
-%define TOKEN_MINUS       9
-%define TOKEN_MULTIPLY    10
-%define TOKEN_DIVIDE      11
-
-%define TYPE_INTEGER      1
-%define TYPE_STRING       2
-%define TYPE_BOOLEAN      3
-
-%define SYMBOL_VARIABLE   1
-%define SYMBOL_CONSTANT   2
-
-%define SEMANTIC_OK       0
-%define SEMANTIC_ERROR    1
+%define NODE_PROGRAM       1
+%define NODE_BLOCK         2
+%define NODE_VAR           3
+%define NODE_FUNCTION      4
+%define NODE_PARAMETER     5
+%define NODE_RETURN        6
+%define NODE_IF            7
+%define NODE_WHILE         8
+%define NODE_BINARY        9
+%define NODE_UNARY         10
+%define NODE_ASSIGN        11
+%define NODE_CALL          12
+%define NODE_IDENTIFIER    13
+%define NODE_INTEGER       14
+%define NODE_STRING        15
+%define NODE_CHARACTER     16
+%define NODE_BOOLEAN       17
+%define NODE_NIL           18
+%define NODE_MEMBER        19
+%define NODE_ARRAY         20
+%define NODE_BREAK         21
+%define NODE_CONTINUE      22
 
 section .text
 
@@ -33,337 +34,459 @@ asc_semantic:
     push rbp
     mov rbp, rsp
 
+    push rbx
     push r12
     push r13
-    push r14
-    push r15
 
     mov r12, rdi
-    mov r13, rsi
+    xor r13d, r13d
 
-    xor r14, r14
-    xor r15, r15
+    call check_program
 
-    lea rbx, [symbol_table]
+    test eax, eax
+    jz .fail
 
-    call analyze_program
+    mov eax, 1
 
-    mov rax, SEMANTIC_OK
-
-    cmp r15, 0
-    jne semantic_failed
-
-    jmp semantic_finished
-
-semantic_failed:
-
-    mov rax, SEMANTIC_ERROR
-
-semantic_finished:
-
-    pop r15
-    pop r14
     pop r13
     pop r12
-
+    pop rbx
     pop rbp
+    ret
 
+.fail:
+
+    xor eax, eax
+
+    pop r13
+    pop r12
+    pop rbx
+    pop rbp
     ret
 
 
-analyze_program:
+check_program:
 
-    xor r14, r14
+    mov r8, [r12 + 16]
 
-program_loop:
-
-    cmp r14, r13
-    jae program_finished
-
-    mov rax, [r12 + r14 * 32]
-
-    cmp rax, AST_VARIABLE
-    je analyze_variable
-
-    cmp rax, AST_CONSTANT
-    je analyze_constant
-
-    cmp rax, AST_ASSIGNMENT
-    je analyze_assignment
-
-    cmp rax, AST_WHILE
-    je analyze_while
-
-    inc r14
-    jmp program_loop
-
-program_finished:
-
-    ret
-
-
-analyze_variable:
-
-    mov r8, [r12 + r14 * 32 + 8]
-
-    call find_symbol
-
-    test rax, rax
-    jnz semantic_error
-
-    mov r8, [r12 + r14 * 32 + 8]
-    mov r9, [r12 + r14 * 32 + 16]
-
-    call add_variable
-
-    mov r10, [r12 + r14 * 32 + 24]
-
-    test r10, r10
-    jz variable_finished
-
-    mov rdi, r10
-
-    call analyze_expression
-
-    cmp rax, TYPE_INTEGER
-    jne semantic_error
-
-variable_finished:
-
-    inc r14
-    jmp program_loop
-
-
-analyze_constant:
-
-    mov r8, [r12 + r14 * 32 + 8]
-
-    call find_symbol
-
-    test rax, rax
-    jnz semantic_error
-
-    mov r8, [r12 + r14 * 32 + 8]
-    mov r9, [r12 + r14 * 32 + 16]
-
-    call add_constant
-
-    mov r10, [r12 + r14 * 32 + 24]
-
-    test r10, r10
-    jz constant_finished
-
-    mov rdi, r10
-
-    call analyze_expression
-
-    cmp rax, TYPE_INTEGER
-    jne semantic_error
-
-constant_finished:
-
-    inc r14
-    jmp program_loop
-
-
-analyze_assignment:
-
-    mov r8, [r12 + r14 * 32 + 8]
-
-    call find_symbol
-
-    test rax, rax
-    jz semantic_error
-
-    cmp dword [rax + 16], SYMBOL_VARIABLE
-    jne semantic_error
-
-    mov r10, [r12 + r14 * 32 + 16]
-
-    test r10, r10
-    jz semantic_error
-
-    mov rdi, r10
-
-    call analyze_expression
-
-    cmp rax, TYPE_INTEGER
-    jne semantic_error
-
-    inc r14
-    jmp program_loop
-
-
-analyze_while:
-
-    mov r8, [r12 + r14 * 32 + 8]
+.loop:
 
     test r8, r8
-    jz semantic_error
+    jz .ok
 
     mov rdi, r8
+    call check_node
 
-    call analyze_expression
+    test eax, eax
+    jz .fail
 
-    cmp rax, TYPE_BOOLEAN
-    je while_condition_valid
+    mov r8, [r8 + 24]
+    jmp .loop
 
-    cmp rax, TYPE_INTEGER
-    jne semantic_error
+.ok:
+    mov eax, 1
+    ret
 
-while_condition_valid:
+.fail:
+    xor eax, eax
+    ret
 
-    inc r14
-    jmp program_loop
 
-
-analyze_expression:
-
-    test rdi, rdi
-    jz expression_error
+check_node:
 
     mov eax, [rdi]
 
-    cmp eax, AST_INTEGER
-    je expression_integer
+    cmp eax, NODE_VAR
+    je check_variable
 
-    cmp eax, AST_IDENTIFIER
-    je expression_identifier
+    cmp eax, NODE_FUNCTION
+    je check_function
 
-    cmp eax, AST_BINARY
-    je expression_binary
+    cmp eax, NODE_BLOCK
+    je check_block
 
-    jmp expression_error
+    cmp eax, NODE_RETURN
+    je check_return
 
+    cmp eax, NODE_IF
+    je check_if
 
-expression_integer:
+    cmp eax, NODE_WHILE
+    je check_while
 
-    mov eax, TYPE_INTEGER
+    cmp eax, NODE_BINARY
+    je check_binary
+
+    cmp eax, NODE_ASSIGN
+    je check_assignment
+
+    cmp eax, NODE_CALL
+    je check_call
+
+    cmp eax, NODE_BREAK
+    je check_break
+
+    cmp eax, NODE_CONTINUE
+    je check_continue
+
+    mov eax, 1
     ret
 
 
-expression_identifier:
+check_variable:
 
     mov r8, [rdi + 8]
 
-    call find_symbol
+    test r8, r8
+    jz .fail
 
-    test rax, rax
-    jz expression_error
-
-    mov eax, TYPE_INTEGER
-    ret
-
-
-expression_binary:
-
-    mov r8, [rdi + 16]
-    mov r9, [rdi + 24]
+    mov r8, [rdi + 24]
 
     test r8, r8
-    jz expression_error
-
-    test r9, r9
-    jz expression_error
+    jz .ok
 
     mov rdi, r8
-    call analyze_expression
-
-    cmp rax, TYPE_INTEGER
-    jne expression_error
-
-    mov rdi, r9
-    call analyze_expression
-
-    cmp rax, TYPE_INTEGER
-    jne expression_error
-
-    mov eax, TYPE_INTEGER
-    ret
-
-
-expression_error:
-
-    mov eax, -1
-    ret
-
-
-find_symbol:
-
-    xor rcx, rcx
-
-find_symbol_loop:
-
-    cmp rcx, [symbol_count]
-    jae symbol_not_found
-
-    mov rax, rcx
-    imul rax, 32
-
-    lea rdx, [symbol_table + rax]
-
-    mov rax, [rdx]
-
-    cmp rax, r8
-    je symbol_found
-
-    inc rcx
-    jmp find_symbol_loop
-
-symbol_found:
-
-    mov rax, rdx
-    ret
-
-symbol_not_found:
-
-    xor rax, rax
-    ret
-
-
-add_variable:
-
-    mov rax, [symbol_count]
-    imul rax, 32
-
-    lea rdx, [symbol_table + rax]
-
-    mov [rdx], r8
-    mov dword [rdx + 16], SYMBOL_VARIABLE
-    mov dword [rdx + 20], TYPE_INTEGER
-
-    inc qword [symbol_count]
+    call check_expression
 
     ret
 
+.ok:
+    mov eax, 1
+    ret
 
-add_constant:
-
-    mov rax, [symbol_count]
-    imul rax, 32
-
-    lea rdx, [symbol_table + rax]
-
-    mov [rdx], r8
-    mov dword [rdx + 16], SYMBOL_CONSTANT
-    mov dword [rdx + 20], TYPE_INTEGER
-
-    inc qword [symbol_count]
-
+.fail:
+    xor eax, eax
     ret
 
 
-semantic_error:
+check_function:
 
-    mov r15, 1
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    mov r8, [rdi + 16]
+
+.parameters:
+
+    test r8, r8
+    jz .body
+
+    mov r9, [r8 + 8]
+
+    test r9, r9
+    jz .fail
+
+    mov r8, [r8 + 24]
+    jmp .parameters
+
+.body:
+
+    mov r8, [rdi + 40]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_node
 
     ret
 
+.fail:
+    xor eax, eax
+    ret
 
-section .bss
 
-symbol_count:
-    resq 1
+check_block:
 
-symbol_table:
-    resb 32768
+    mov r8, [rdi + 16]
+
+.loop:
+
+    test r8, r8
+    jz .ok
+
+    mov rdi, r8
+    call check_node
+
+    test eax, eax
+    jz .fail
+
+    mov r8, [r8 + 24]
+    jmp .loop
+
+.ok:
+    mov eax, 1
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_return:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .ok
+
+    mov rdi, r8
+    call check_expression
+
+    ret
+
+.ok:
+    mov eax, 1
+    ret
+
+
+check_if:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_expression
+
+    test eax, eax
+    jz .fail
+
+    mov r8, [rdi + 16]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_node
+
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_while:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_expression
+
+    test eax, eax
+    jz .fail
+
+    mov r8, [rdi + 16]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_node
+
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_binary:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_expression
+
+    test eax, eax
+    jz .fail
+
+    mov r8, [rdi + 16]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_expression
+
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_assignment:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    cmp dword [r8], NODE_IDENTIFIER
+    jne .fail
+
+    mov r8, [rdi + 16]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_expression
+
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_call:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    cmp dword [r8], NODE_IDENTIFIER
+    je .arguments
+
+    cmp dword [r8], NODE_MEMBER
+    jne .fail
+
+.arguments:
+
+    mov r8, [rdi + 16]
+
+.loop:
+
+    test r8, r8
+    jz .ok
+
+    mov rdi, r8
+    call check_expression
+
+    test eax, eax
+    jz .fail
+
+    mov r8, [r8 + 24]
+    jmp .loop
+
+.ok:
+    mov eax, 1
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_expression:
+
+    mov eax, [rdi]
+
+    cmp eax, NODE_IDENTIFIER
+    je .ok
+
+    cmp eax, NODE_INTEGER
+    je .ok
+
+    cmp eax, NODE_STRING
+    je .ok
+
+    cmp eax, NODE_CHARACTER
+    je .ok
+
+    cmp eax, NODE_BOOLEAN
+    je .ok
+
+    cmp eax, NODE_NIL
+    je .ok
+
+    cmp eax, NODE_BINARY
+    je check_binary
+
+    cmp eax, NODE_UNARY
+    je .unary
+
+    cmp eax, NODE_CALL
+    je check_call
+
+    cmp eax, NODE_MEMBER
+    je .member
+
+    cmp eax, NODE_ARRAY
+    je .array
+
+    xor eax, eax
+    ret
+
+.unary:
+
+    mov r8, [rdi + 8]
+
+    test r8, r8
+    jz .fail
+
+    mov rdi, r8
+    call check_expression
+    ret
+
+.member:
+
+    mov r8, [rdi + 8]
+    mov r9, [rdi + 16]
+
+    test r8, r8
+    jz .fail
+
+    test r9, r9
+    jz .fail
+
+    mov eax, 1
+    ret
+
+.array:
+
+    mov r8, [rdi + 16]
+
+.array_loop:
+
+    test r8, r8
+    jz .ok
+
+    mov rdi, r8
+    call check_expression
+
+    test eax, eax
+    jz .fail
+
+    mov r8, [r8 + 24]
+    jmp .array_loop
+
+.ok:
+    mov eax, 1
+    ret
+
+.fail:
+    xor eax, eax
+    ret
+
+
+check_break:
+    mov eax, 1
+    ret
+
+check_continue:
+    mov eax, 1
+    ret
