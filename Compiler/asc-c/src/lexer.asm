@@ -2,6 +2,8 @@ bits 64
 
 global asc_lexer
 
+extern malloc
+
 %define TOKEN_EOF          0
 %define TOKEN_IDENTIFIER   1
 %define TOKEN_INTEGER      2
@@ -12,177 +14,180 @@ global asc_lexer
 %define TOKEN_PUNCTUATION  7
 %define TOKEN_ERROR        8
 
-%define OP_PLUS            1
-%define OP_MINUS           2
-%define OP_MULTIPLY        3
-%define OP_DIVIDE          4
-%define OP_MODULO          5
-%define OP_ASSIGN          6
-%define OP_EQUAL           7
-%define OP_NOT_EQUAL       8
-%define OP_LESS            9
-%define OP_GREATER         10
-%define OP_LESS_EQUAL      11
-%define OP_GREATER_EQUAL   12
-%define OP_AND             13
-%define OP_OR              14
-%define OP_NOT             15
-%define OP_BIT_AND         16
-%define OP_BIT_OR          17
-%define OP_BIT_XOR         18
-%define OP_SHIFT_LEFT      19
-%define OP_SHIFT_RIGHT     20
-%define OP_INCREMENT       21
-%define OP_DECREMENT       22
-%define OP_ARROW           23
-%define OP_RANGE           24
-%define OP_OPTIONAL        25
-%define OP_NULL_COALESCE   26
-%define OP_PLUS_ASSIGN     27
-%define OP_MINUS_ASSIGN    28
-%define OP_MULT_ASSIGN     29
-%define OP_DIV_ASSIGN      30
+%define TOKEN_SIZE         32
+%define MAX_TOKENS         1048576
 
-%define PAREN_OPEN         1
-%define PAREN_CLOSE        2
-%define BRACKET_OPEN       3
-%define BRACKET_CLOSE      4
-%define BRACE_OPEN         5
-%define BRACE_CLOSE        6
-%define COMMA              7
-%define COLON              8
-%define SEMICOLON          9
-%define DOT                10
-%define QUESTION           11
-%define AT                 12
+%define KW_VAR             1
+%define KW_LET             2
+%define KW_FUNC            3
+%define KW_FUNCTION        4
+%define KW_IF              5
+%define KW_ELSE            6
+%define KW_WHILE           7
+%define KW_DO              8
+%define KW_FOR              9
+%define KW_IN              10
+%define KW_RETURN          11
+%define KW_BREAK           12
+%define KW_CONTINUE        13
+%define KW_TRUE             14
+%define KW_FALSE            15
+%define KW_NIL              16
+%define KW_STRUCT           17
+%define KW_CLASS            18
+%define KW_ENUM             19
+%define KW_PROTOCOL         20
+%define KW_EXTENSION        21
+%define KW_IMPORT           22
+%define KW_PUBLIC           23
+%define KW_PRIVATE          24
+%define KW_INTERNAL         25
+%define KW_STATIC           26
+%define KW_FINAL            27
+%define KW_OPEN             28
+%define KW_OVERRIDE         29
+%define KW_INIT             30
+%define KW_DEINIT           31
+%define KW_SELF             32
+%define KW_SUPER            33
+%define KW_AS               34
+%define KW_IS               35
+%define KW_TYPE             36
+%define KW_WHERE            37
+%define KW_THROWS           38
+%define KW_RETHROWS         39
+%define KW_TRY              40
+%define KW_CATCH            41
+%define KW_THROW            42
+%define KW_DEFER            43
+%define KW_GUARD            44
+%define KW_SWITCH            45
+%define KW_CASE             46
+%define KW_DEFAULT          47
+%define KW_FALLTHROUGH      48
+%define KW_REPEAT           49
+%define KW_MATCH            50
+%define KW_ASYNC            51
+%define KW_AWAIT            52
+%define KW_ACTOR            53
+%define KW_TASK             54
+%define KW_SEND             55
+%define KW_RECEIVE          56
+%define KW_MOVE             57
+%define KW_COPY             58
+%define KW_REFERENCE        59
+%define KW_POINTER          60
+%define KW_ADDRESS          61
+%define KW_DEREFERENCE      62
+%define KW_OPERATOR         63
+%define KW_PRECEDENCE       64
+%define KW_ASSOCIATIVITY    65
+%define KW_INOUT            66
+%define KW_VARIADIC         67
+%define KW_EXTERN           68
+%define KW_INLINE           69
+%define KW_VOLATILE         70
+%define KW_UNSAFE           71
+%define KW_ASM              72
+%define KW_SIZEOF           73
+%define KW_ALIGNOF          74
+%define KW_TYPEOF           75
+%define KW_BITCAST          76
+%define KW_UNREACHABLE      77
+%define KW_NAMESPACE        78
+%define KW_USING            79
+%define KW_ALIAS            80
+%define KW_RESTRICT         81
+%define KW_CONSTEXPR        82
+%define KW_PACKED           83
+%define KW_ALIGN            84
+%define KW_SECTION          85
+%define KW_EXPORT           86
+%define KW_LINK             87
+%define KW_TARGET           88
+%define KW_GET              89
+%define KW_SET              90
+%define KW_WILLSET          91
+%define KW_DIDSET           92
+%define KW_LAZY             93
+%define KW_WEAK             94
+%define KW_UNOWNED          95
+%define KW_REQUIRED         96
+%define KW_CONVENIENCE      97
+%define KW_INDIRECT         98
+%define KW_INFIX            99
+%define KW_PREFIX           100
+%define KW_POSTFIX          101
+%define KW_PRECEDENCEGROUP  102
+%define KW_TEMPLATE         103
+%define KW_TYPENAME         104
+%define KW_CONCEPT          105
+%define KW_FRIEND           106
+%define KW_VIRTUAL          107
+%define KW_PROTECTED        108
+%define KW_DELETE           109
+%define KW_NEW              110
+%define KW_THIS             111
+%define KW_NULLPTR          112
+%define KW_STATIC_ASSERT    113
+%define KW_NOEXCEPT         114
+%define KW_THREADLOCAL      115
+%define KW_SYNCHRONIZED     116
+%define KW_YIELD            117
+%define KW_TYPEALIAS        118
+%define KW_OPTIONAL         119
+%define KW_NONMUTATING      120
+%define KW_MUTATING         121
+%define KW_CONSUMING        122
+%define KW_BORROWING        123
+%define KW_ISOLATED         124
+%define KW_NONISOLATED      125
+%define KW_ACTIVATED        126
+%define KW_END              127
 
-%define KW_VAR             100
-%define KW_LET             101
-%define KW_MUTABLE         102
-%define KW_IMMUTABLE       103
-%define KW_IF              104
-%define KW_ELSE            105
-%define KW_WHILE           106
-%define KW_DO              107
-%define KW_FOR             108
-%define KW_IN              109
-%define KW_BREAK           110
-%define KW_CONTINUE        111
-%define KW_RETURN          112
-%define KW_FUNCTION        113
-%define KW_STRUCT          114
-%define KW_CLASS           115
-%define KW_ENUM            116
-%define KW_PROTOCOL        117
-%define KW_EXTENSION       118
-%define KW_IMPORT          119
-%define KW_PUBLIC          120
-%define KW_PRIVATE         121
-%define KW_INTERNAL        122
-%define KW_FILEPRIVATE     123
-%define KW_STATIC          124
-%define KW_FINAL           125
-%define KW_OPEN            126
-%define KW_OVERRIDE        127
-%define KW_INIT            128
-%define KW_DEINIT          129
-%define KW_SELF            130
-%define KW_SUPER           131
-%define KW_TRUE            132
-%define KW_FALSE           133
-%define KW_NIL             134
-%define KW_AS              135
-%define KW_IS              136
-%define KW_TYPE            137
-%define KW_PROTOCOLS       138
-%define KW_GENERIC         139
-%define KW_WHERE           140
-%define KW_ASSOCIATED      141
-%define KW_REQUIRES        142
-%define KW_THROWS          143
-%define KW_RETHROWS        144
-%define KW_TRY             145
-%define KW_CATCH           146
-%define KW_THROW           147
-%define KW_DEFER           148
-%define KW_GUARD           149
-%define KW_SWITCH           150
-%define KW_CASE             151
-%define KW_DEFAULT          152
-%define KW_FALLTHROUGH      153
-%define KW_REPEAT           154
-%define KW_MATCH            155
-%define KW_ASYNC            156
-%define KW_AWAIT            157
-%define KW_ACTOR            158
-%define KW_TASK             159
-%define KW_SEND             160
-%define KW_RECEIVE          161
-%define KW_MOVE             162
-%define KW_COPY             163
-%define KW_REFERENCE        164
-%define KW_POINTER          165
-%define KW_ADDRESS          166
-%define KW_DEREFERENCE      167
-%define KW_OPERATOR         168
-%define KW_PRECEDENCE       169
-%define KW_ASSOCIATIVITY    170
-%define KW_INOUT            171
-%define KW_VARIADIC         172
-%define KW_EXTERN           173
-%define KW_INLINE           174
-%define KW_VOLATILE         175
-%define KW_UNSAFE           176
-%define KW_ASM              177
-%define KW_SIZEOF           178
-%define KW_ALIGNOF          179
-%define KW_TYPEOF           180
-%define KW_BITCAST          181
-%define KW_UNREACHABLE      182
-%define KW_EXTERN_C         183
-%define KW_NAMESPACE        184
-%define KW_USING             185
-%define KW_ALIAS             186
-%define KW_RESTRICT          187
-%define KW_CONSTEXPR         188
-%define KW_PACKED            189
-%define KW_ALIGN             190
-%define KW_SECTION           191
-%define KW_EXPORT            192
-%define KW_IMPORT_ASM        193
-%define KW_LINK              194
-%define KW_TARGET            195
-%define KW_FUNC              196
-%define KW_GET               197
-%define KW_SET               198
-%define KW_WILLSET           199
-%define KW_DIDSET            200
-%define KW_LAZY              201
-%define KW_WEAK              202
-%define KW_UNOWNED           203
-%define KW_REQUIRED          204
-%define KW_CONVENIENCE       205
-%define KW_INDIRECT          206
-%define KW_INFIX             207
-%define KW_PREFIX            208
-%define KW_POSTFIX           209
-%define KW_PRECEDENCEGROUP   210
-%define KW_TEMPLATE          211
-%define KW_TYPENAME          212
-%define KW_CONCEPT           213
-%define KW_FRIEND            214
-%define KW_VIRTUAL           215
-%define KW_PROTECTED         216
-%define KW_DELETE            217
-%define KW_NEW               218
-%define KW_THIS              219
-%define KW_NULLPTR           220
-%define KW_STATIC_ASSERT     221
-%define KW_NOEXCEPT          222
-%define KW_THREADLOCAL       223
-%define KW_SYNCHRONIZED      224
-%define KW_YIELD             225
-%define KW_TYPEALIAS         226
+%define OP_PLUS             1
+%define OP_MINUS            2
+%define OP_MUL              3
+%define OP_DIV              4
+%define OP_MOD              5
+%define OP_ASSIGN           6
+%define OP_EQ               7
+%define OP_NE               8
+%define OP_LT               9
+%define OP_GT               10
+%define OP_LE               11
+%define OP_GE               12
+%define OP_AND              13
+%define OP_OR               14
+%define OP_NOT              15
+%define OP_BITAND           16
+%define OP_BITOR            17
+%define OP_XOR              18
+%define OP_SHL              19
+%define OP_SHR              20
+%define OP_INC              21
+%define OP_DEC              22
+%define OP_ARROW            23
+%define OP_RANGE            24
+%define OP_OPTIONAL         25
+%define OP_COALESCE         26
+%define OP_ADD_ASSIGN       27
+%define OP_SUB_ASSIGN       28
+%define OP_MUL_ASSIGN       29
+%define OP_DIV_ASSIGN       30
+
+%define P_OPEN              1
+%define P_CLOSE             2
+%define P_LBRACKET          3
+%define P_RBRACKET          4
+%define P_LBRACE            5
+%define P_RBRACE            6
+%define P_COMMA             7
+%define P_COLON             8
+%define P_SEMICOLON         9
+%define P_DOT               10
+%define P_QUESTION          11
+%define P_AT                12
 
 section .text
 
@@ -191,1245 +196,717 @@ asc_lexer:
     push rbp
     mov rbp, rsp
 
+    push rbx
     push r12
     push r13
     push r14
     push r15
-    push rbx
 
     mov r12, rdi
     mov r13, rsi
 
-    xor r14, r14
-    xor r15, r15
+    mov rdi, MAX_TOKENS * TOKEN_SIZE
+    call malloc
 
-    lea rbx, [token_buffer]
+    test rax, rax
+    jz .fail
 
-lexer_loop:
+    mov r14, rax
+    xor r15d, r15d
+    xor ebx, ebx
 
-    cmp r14, r13
-    jae lexer_finish
+.loop:
 
-    mov al, [r12 + r14]
+    cmp rbx, r13
+    jae .eof
+
+    mov al, [r12 + rbx]
 
     cmp al, ' '
-    je skip_character
+    je .space
 
     cmp al, 9
-    je skip_character
+    je .space
 
     cmp al, 10
-    je skip_character
+    je .newline
 
     cmp al, 13
-    je skip_character
+    je .newline
 
-    cmp al, '/'
-    jne check_identifier
+    cmp al, '"'
+    je .string
 
-    mov rax, r14
-    inc rax
+    cmp al, 39
+    je .character
 
-    cmp rax, r13
-    jae check_operator
+    cmp al, '0'
+    jb .not_number
 
-    mov dl, [r12 + rax]
+    cmp al, '9'
+    jbe .number
 
-    cmp dl, '/'
-    je line_comment
-
-    cmp dl, '*'
-    je block_comment
-
-    jmp check_operator
-
-line_comment:
-
-    add r14, 2
-
-line_comment_loop:
-
-    cmp r14, r13
-    jae lexer_loop
-
-    mov al, [r12 + r14]
-
-    inc r14
-
-    cmp al, 10
-    jne line_comment_loop
-
-    jmp lexer_loop
-
-block_comment:
-
-    add r14, 2
-
-block_comment_loop:
-
-    cmp r14, r13
-    jae unterminated_comment
-
-    mov al, [r12 + r14]
-
-    cmp al, '*'
-    jne block_comment_next
-
-    mov rax, r14
-    inc rax
-
-    cmp rax, r13
-    jae block_comment_next
-
-    mov dl, [r12 + rax]
-
-    cmp dl, '/'
-    je block_comment_end
-
-block_comment_next:
-
-    inc r14
-    jmp block_comment_loop
-
-block_comment_end:
-
-    add r14, 2
-    jmp lexer_loop
-
-check_identifier:
-
-    mov al, [r12 + r14]
+.not_number:
 
     call is_identifier_start
+    jc .identifier
+
+    jmp .operator
+
+.space:
+
+    inc rbx
+    jmp .loop
+
+.newline:
+
+    inc rbx
+    jmp .loop
+
+.identifier:
+
+    mov r8, rbx
+
+.identifier_loop:
+
+    cmp rbx, r13
+    jae .identifier_done
+
+    mov al, [r12 + rbx]
+
+    call is_identifier_continue
+    jnc .identifier_done
+
+    inc rbx
+    jmp .identifier_loop
+
+.identifier_done:
+
+    mov r9, rbx
+
+    mov rdi, r12
+    add rdi, r8
+    mov rsi, r9
+    sub rsi, r8
+
+    call keyword_lookup
 
     test eax, eax
-    jz check_number
+    jz .identifier_token
 
-    mov r8, r14
+    mov r10d, eax
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-identifier_loop:
+    mov dword [rdi], TOKEN_KEYWORD
+    mov dword [rdi + 4], r10d
+    mov qword [rdi + 8], r8
+    mov qword [rdi + 16], r9
 
-    cmp r14, r13
-    jae identifier_finished
-
-    mov al, [r12 + r14]
-
-    call is_identifier_character
-
-    test eax, eax
-    jz identifier_finished
-
-    inc r14
-    jmp identifier_loop
-
-identifier_finished:
-
-    mov r9, r14
-    sub r9, r8
-
-    lea rsi, [r12 + r8]
-    mov rdx, r9
-
-    call lookup_keyword
-
-    test eax, eax
-    jz emit_identifier
-
-    mov dword [rbx], TOKEN_KEYWORD
-    mov dword [rbx + 4], eax
-    mov qword [rbx + 8], rsi
-    mov qword [rbx + 16], r9
-    mov qword [rbx + 24], r8
-
-    add rbx, 32
     inc r15
+    jmp .loop
 
-    jmp lexer_loop
+.identifier_token:
 
-emit_identifier:
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-    mov dword [rbx], TOKEN_IDENTIFIER
-    mov dword [rbx + 4], 0
-    mov qword [rbx + 8], rsi
-    mov qword [rbx + 16], r9
-    mov qword [rbx + 24], r8
+    mov dword [rdi], TOKEN_IDENTIFIER
+    mov qword [rdi + 8], r8
+    mov qword [rdi + 16], r9
 
-    add rbx, 32
     inc r15
+    jmp .loop
 
-    jmp lexer_loop
+.number:
 
-check_number:
+    mov r8, rbx
 
-    mov al, [r12 + r14]
+.number_loop:
+
+    cmp rbx, r13
+    jae .number_done
+
+    mov al, [r12 + rbx]
 
     cmp al, '0'
-    jb check_string
+    jb .number_done
 
     cmp al, '9'
-    ja check_string
+    ja .number_done
 
-    mov r8, r14
-    xor r9, r9
+    inc rbx
+    jmp .number_loop
 
-number_loop:
+.number_done:
 
-    cmp r14, r13
-    jae number_finished
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-    mov al, [r12 + r14]
+    mov dword [rdi], TOKEN_INTEGER
+    mov qword [rdi + 8], r8
+    mov qword [rdi + 16], rbx
 
-    cmp al, '0'
-    jb number_finished
-
-    cmp al, '9'
-    ja number_finished
-
-    sub al, '0'
-    movzx rax, al
-
-    imul r9, r9, 10
-    add r9, rax
-
-    inc r14
-
-    jmp number_loop
-
-number_finished:
-
-    mov dword [rbx], TOKEN_INTEGER
-    mov dword [rbx + 4], 0
-    mov qword [rbx + 8], r8
-    mov qword [rbx + 16], r14
-    sub qword [rbx + 16], r8
-    mov qword [rbx + 24], r9
-
-    add rbx, 32
     inc r15
+    jmp .loop
 
-    jmp lexer_loop
+.string:
 
-check_string:
+    inc rbx
+    mov r8, rbx
+
+.string_loop:
+
+    cmp rbx, r13
+    jae .fail
+
+    mov al, [r12 + rbx]
 
     cmp al, '"'
-    je string_literal
+    je .string_done
 
-    cmp al, "'"
-    je character_literal
+    inc rbx
+    jmp .string_loop
 
-    jmp check_operator
+.string_done:
 
-string_literal:
+    mov r9, rbx
+    inc rbx
 
-    mov r8, r14
-    inc r14
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-string_loop:
+    mov dword [rdi], TOKEN_STRING
+    mov qword [rdi + 8], r8
+    mov qword [rdi + 16], r9
 
-    cmp r14, r13
-    jae unterminated_string
-
-    mov al, [r12 + r14]
-
-    cmp al, '\'
-    jne string_normal
-
-    mov rax, r14
-    inc rax
-
-    cmp rax, r13
-    jae unterminated_string
-
-    add r14, 2
-    jmp string_loop
-
-string_normal:
-
-    cmp al, '"'
-    je string_finished
-
-    cmp al, 10
-    je unterminated_string
-
-    inc r14
-    jmp string_loop
-
-string_finished:
-
-    inc r14
-
-    mov dword [rbx], TOKEN_STRING
-    mov dword [rbx + 4], 0
-    mov qword [rbx + 8], r8
-    mov qword [rbx + 16], r14
-    sub qword [rbx + 16], r8
-    mov qword [rbx + 24], r8
-
-    add rbx, 32
     inc r15
+    jmp .loop
 
-    jmp lexer_loop
+.character:
 
-character_literal:
+    inc rbx
+    mov r8, rbx
 
-    mov r8, r14
-    inc r14
+    cmp rbx, r13
+    jae .fail
 
-character_loop:
+    inc rbx
 
-    cmp r14, r13
-    jae unterminated_character
+    cmp rbx, r13
+    jae .fail
 
-    mov al, [r12 + r14]
+    cmp byte [r12 + rbx], 39
+    jne .fail
 
-    cmp al, '\'
-    jne character_normal
+    mov r9, rbx
+    inc rbx
 
-    mov rax, r14
-    inc rax
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-    cmp rax, r13
-    jae unterminated_character
+    mov dword [rdi], TOKEN_CHARACTER
+    mov qword [rdi + 8], r8
+    mov qword [rdi + 16], r9
 
-    add r14, 2
-    jmp character_loop
-
-character_normal:
-
-    cmp al, "'"
-    je character_finished
-
-    cmp al, 10
-    je unterminated_character
-
-    inc r14
-    jmp character_loop
-
-character_finished:
-
-    inc r14
-
-    mov dword [rbx], TOKEN_CHARACTER
-    mov dword [rbx + 4], 0
-    mov qword [rbx + 8], r8
-    mov qword [rbx + 16], r14
-    sub qword [rbx + 16], r8
-    mov qword [rbx + 24], r8
-
-    add rbx, 32
     inc r15
+    jmp .loop
 
-    jmp lexer_loop
+.operator:
 
-check_operator:
-
-    mov al, [r12 + r14]
+    mov r8d, OP_ASSIGN
+    mov r9d, 1
 
     cmp al, '+'
-    je lex_plus
+    jne .op_minus
+    mov r8d, OP_PLUS
+    jmp .operator_check
+
+.op_minus:
 
     cmp al, '-'
-    je lex_minus
+    jne .op_mul
+    mov r8d, OP_MINUS
+    jmp .operator_check
+
+.op_mul:
 
     cmp al, '*'
-    je lex_star
+    jne .op_div
+    mov r8d, OP_MUL
+    jmp .operator_check
+
+.op_div:
 
     cmp al, '/'
-    je lex_slash
+    jne .op_mod
+    mov r8d, OP_DIV
+    jmp .operator_check
+
+.op_mod:
 
     cmp al, '%'
-    je lex_modulo
+    jne .op_eq
+    mov r8d, OP_MOD
+    jmp .operator_check
+
+.op_eq:
 
     cmp al, '='
-    je lex_equal
+    jne .op_not
+    mov r8d, OP_ASSIGN
+    jmp .two_char
+
+.op_not:
 
     cmp al, '!'
-    je lex_not
+    jne .op_lt
+    mov r8d, OP_NOT
+    jmp .two_char
+
+.op_lt:
 
     cmp al, '<'
-    je lex_less
+    jne .op_gt
+    mov r8d, OP_LT
+    jmp .two_char
+
+.op_gt:
 
     cmp al, '>'
-    je lex_greater
+    jne .op_and
+    mov r8d, OP_GT
+    jmp .two_char
+
+.op_and:
 
     cmp al, '&'
-    je lex_ampersand
+    jne .op_or
+    mov r8d, OP_BITAND
+    jmp .operator_check
+
+.op_or:
 
     cmp al, '|'
-    je lex_pipe
+    jne .punctuation
+    mov r8d, OP_BITOR
+    jmp .operator_check
 
-    cmp al, '^'
-    je lex_xor
+.two_char:
 
-    cmp al, '?'
-    je lex_question
+    cmp rbx, r13
+    jae .operator_check
 
-    jmp check_punctuation
+    mov al, [r12 + rbx + 1]
 
-lex_plus:
+    cmp al, '='
+    jne .operator_check
 
-    mov eax, OP_PLUS
-    call check_plus_variants
-    jmp emit_operator
+    cmp r8d, OP_ASSIGN
+    jne .not_eq
 
-check_plus_variants:
+    mov r8d, OP_EQ
+    jmp .two_char_done
 
-    mov r10, r14
-    inc r10
+.not_eq:
 
-    cmp r10, r13
-    jae .done
+    cmp r8d, OP_NOT
+    jne .le
 
-    mov dl, [r12 + r10]
+    mov r8d, OP_NE
+    jmp .two_char_done
 
-    cmp dl, '+'
-    je .increment
+.le:
 
-    cmp dl, '='
-    je .assign
+    cmp r8d, OP_LT
+    jne .ge
 
-.done:
+    mov r8d, OP_LE
+    jmp .two_char_done
 
-    ret
+.ge:
 
-.increment:
+    cmp r8d, OP_GT
+    jne .two_char_done
 
-    mov eax, OP_INCREMENT
-    add r14, 2
-    jmp emit_operator_direct
+    mov r8d, OP_GE
 
-.assign:
+.two_char_done:
 
-    mov eax, OP_PLUS_ASSIGN
-    add r14, 2
-    jmp emit_operator_direct
+    add r9d, 1
 
-lex_minus:
+.operator_check:
 
-    mov eax, OP_MINUS
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-    mov r10, r14
-    inc r10
+    mov dword [rdi], TOKEN_OPERATOR
+    mov dword [rdi + 4], r8d
+    mov qword [rdi + 8], rbx
+    mov rax, rbx
+    add rax, r9
+    mov qword [rdi + 16], rax
 
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '-'
-    je minus_increment
-
-    cmp dl, '>'
-    je minus_arrow
-
-    cmp dl, '='
-    je minus_assign
-
-    jmp emit_operator
-
-minus_increment:
-
-    mov eax, OP_DECREMENT
-    add r14, 2
-    jmp emit_operator_direct
-
-minus_arrow:
-
-    mov eax, OP_ARROW
-    add r14, 2
-    jmp emit_operator_direct
-
-minus_assign:
-
-    mov eax, OP_MINUS_ASSIGN
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_star:
-
-    mov eax, OP_MULTIPLY
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '='
-    je multiply_assign
-
-    jmp emit_operator
-
-multiply_assign:
-
-    mov eax, OP_MULT_ASSIGN
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_slash:
-
-    mov eax, OP_DIVIDE
-    jmp emit_operator
-
-lex_modulo:
-
-    mov eax, OP_MODULO
-    jmp emit_operator
-
-lex_equal:
-
-    mov eax, OP_ASSIGN
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '='
-    je equality
-
-equality:
-
-    mov eax, OP_EQUAL
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_not:
-
-    mov eax, OP_NOT
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '='
-    je not_equal
-
-    jmp emit_operator
-
-not_equal:
-
-    mov eax, OP_NOT_EQUAL
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_less:
-
-    mov eax, OP_LESS
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '='
-    je less_equal
-
-    cmp dl, '<'
-    je shift_left
-
-    jmp emit_operator
-
-less_equal:
-
-    mov eax, OP_LESS_EQUAL
-    add r14, 2
-    jmp emit_operator_direct
-
-shift_left:
-
-    mov eax, OP_SHIFT_LEFT
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_greater:
-
-    mov eax, OP_GREATER
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '='
-    je greater_equal
-
-    cmp dl, '>'
-    je shift_right
-
-    jmp emit_operator
-
-greater_equal:
-
-    mov eax, OP_GREATER_EQUAL
-    add r14, 2
-    jmp emit_operator_direct
-
-shift_right:
-
-    mov eax, OP_SHIFT_RIGHT
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_ampersand:
-
-    mov eax, OP_BIT_AND
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '&'
-    jne emit_operator
-
-    mov eax, OP_AND
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_pipe:
-
-    mov eax, OP_BIT_OR
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '|'
-    jne emit_operator
-
-    mov eax, OP_OR
-    add r14, 2
-    jmp emit_operator_direct
-
-lex_xor:
-
-    mov eax, OP_BIT_XOR
-    jmp emit_operator
-
-lex_question:
-
-    mov eax, OP_OPTIONAL
-
-    mov r10, r14
-    inc r10
-
-    cmp r10, r13
-    jae emit_operator
-
-    mov dl, [r12 + r10]
-
-    cmp dl, '?'
-    jne emit_operator
-
-    mov eax, OP_NULL_COALESCE
-    add r14, 2
-
-emit_operator_direct:
-
-    mov dword [rbx], TOKEN_OPERATOR
-    mov dword [rbx + 4], eax
-    mov qword [rbx + 8], 0
-    mov qword [rbx + 16], 0
-    mov qword [rbx + 24], r14
-
-    add rbx, 32
+    add rbx, r9
     inc r15
+    jmp .loop
 
-    jmp lexer_loop
+.punctuation:
 
-emit_operator:
-
-    inc r14
-    jmp emit_operator_direct
-
-check_punctuation:
-
-    mov al, [r12 + r14]
+    mov r8d, 0
 
     cmp al, '('
-    je punctuation_paren_open
+    jne .pc
+    mov r8d, P_OPEN
+    jmp .punct_done
 
+.pc:
     cmp al, ')'
-    je punctuation_paren_close
+    jne .plb
+    mov r8d, P_CLOSE
+    jmp .punct_done
 
+.plb:
     cmp al, '['
-    je punctuation_bracket_open
+    jne .prb
+    mov r8d, P_LBRACKET
+    jmp .punct_done
 
+.prb:
     cmp al, ']'
-    je punctuation_bracket_close
+    jne .plbrace
+    mov r8d, P_RBRACKET
+    jmp .punct_done
 
+.plbrace:
     cmp al, '{'
-    je punctuation_brace_open
+    jne .prbrace
+    mov r8d, P_LBRACE
+    jmp .punct_done
 
+.prbrace:
     cmp al, '}'
-    je punctuation_brace_close
+    jne .comma
+    mov r8d, P_RBRACE
+    jmp .punct_done
 
+.comma:
     cmp al, ','
-    je punctuation_comma
+    jne .colon
+    mov r8d, P_COMMA
+    jmp .punct_done
 
+.colon:
     cmp al, ':'
-    je punctuation_colon
+    jne .semi
+    mov r8d, P_COLON
+    jmp .punct_done
 
+.semi:
     cmp al, ';'
-    je punctuation_semicolon
+    jne .dot
+    mov r8d, P_SEMICOLON
+    jmp .punct_done
 
+.dot:
     cmp al, '.'
-    je punctuation_dot
+    jne .question
+    mov r8d, P_DOT
+    jmp .punct_done
 
+.question:
+    cmp al, '?'
+    jne .at
+    mov r8d, P_QUESTION
+    jmp .punct_done
+
+.at:
     cmp al, '@'
-    je punctuation_at
+    jne .fail
+    mov r8d, P_AT
 
-    jmp unknown_character
+.punct_done:
 
-punctuation_paren_open:
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-    mov eax, PAREN_OPEN
-    jmp emit_punctuation
+    mov dword [rdi], TOKEN_PUNCTUATION
+    mov dword [rdi + 4], r8d
+    mov qword [rdi + 8], rbx
+    lea rax, [rbx + 1]
+    mov qword [rdi + 16], rax
 
-punctuation_paren_close:
-
-    mov eax, PAREN_CLOSE
-    jmp emit_punctuation
-
-punctuation_bracket_open:
-
-    mov eax, BRACKET_OPEN
-    jmp emit_punctuation
-
-punctuation_bracket_close:
-
-    mov eax, BRACKET_CLOSE
-    jmp emit_punctuation
-
-punctuation_brace_open:
-
-    mov eax, BRACE_OPEN
-    jmp emit_punctuation
-
-punctuation_brace_close:
-
-    mov eax, BRACE_CLOSE
-    jmp emit_punctuation
-
-punctuation_comma:
-
-    mov eax, COMMA
-    jmp emit_punctuation
-
-punctuation_colon:
-
-    mov eax, COLON
-    jmp emit_punctuation
-
-punctuation_semicolon:
-
-    mov eax, SEMICOLON
-    jmp emit_punctuation
-
-punctuation_dot:
-
-    mov eax, DOT
-    jmp emit_punctuation
-
-punctuation_at:
-
-    mov eax, AT
-
-emit_punctuation:
-
-    mov dword [rbx], TOKEN_PUNCTUATION
-    mov dword [rbx + 4], eax
-    mov qword [rbx + 8], r14
-    mov qword [rbx + 16], 1
-    mov qword [rbx + 24], r14
-
-    add rbx, 32
+    inc rbx
     inc r15
-    inc r14
+    jmp .loop
 
-    jmp lexer_loop
+.eof:
 
-unknown_character:
+    mov rdi, r14
+    imul rax, r15, TOKEN_SIZE
+    add rdi, rax
 
-    mov dword [rbx], TOKEN_ERROR
-    mov dword [rbx + 4], 1
-    mov qword [rbx + 8], r14
-    mov qword [rbx + 16], 1
-    mov qword [rbx + 24], r14
+    mov dword [rdi], TOKEN_EOF
+    mov qword [rdi + 8], rbx
+    mov qword [rdi + 16], rbx
 
-    add rbx, 32
-    inc r15
-    inc r14
+    mov rax, r14
+    mov rdx, r15
+    inc rdx
 
-    jmp lexer_loop
-
-unterminated_string:
-
-    mov dword [rbx], TOKEN_ERROR
-    mov dword [rbx + 4], 2
-    mov qword [rbx + 8], r8
-    mov qword [rbx + 16], r14
-    sub qword [rbx + 16], r8
-    mov qword [rbx + 24], r8
-
-    add rbx, 32
-    inc r15
-    jmp lexer_finish
-
-unterminated_character:
-
-    mov dword [rbx], TOKEN_ERROR
-    mov dword [rbx + 4], 3
-    mov qword [rbx + 8], r8
-    mov qword [rbx + 16], r14
-    sub qword [rbx + 16], r8
-    mov qword [rbx + 24], r8
-
-    add rbx, 32
-    inc r15
-    jmp lexer_finish
-
-unterminated_comment:
-
-    mov dword [rbx], TOKEN_ERROR
-    mov dword [rbx + 4], 4
-    mov qword [rbx + 8], r14
-    mov qword [rbx + 16], 0
-    mov qword [rbx + 24], r14
-
-    add rbx, 32
-    inc r15
-
-lexer_finish:
-
-    mov dword [rbx], TOKEN_EOF
-    mov dword [rbx + 4], 0
-    mov qword [rbx + 8], 0
-    mov qword [rbx + 16], 0
-    mov qword [rbx + 24], r14
-
-    mov rax, r15
-    lea rdx, [token_buffer]
-
-    pop rbx
     pop r15
     pop r14
     pop r13
     pop r12
-
+    pop rbx
     pop rbp
-
     ret
+
+.fail:
+
+    xor eax, eax
+    xor edx, edx
+
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbx
+    pop rbp
+    ret
+
 
 is_identifier_start:
 
     cmp al, '_'
-    je identifier_true
+    je .yes
 
     cmp al, 'A'
-    jb identifier_false
+    jb .no
 
     cmp al, 'Z'
-    jbe identifier_true
+    jbe .yes
 
     cmp al, 'a'
-    jb identifier_false
+    jb .no
 
     cmp al, 'z'
-    jbe identifier_true
+    jbe .yes
 
-identifier_false:
-
-    xor eax, eax
+.no:
+    clc
     ret
 
-identifier_true:
-
-    mov eax, 1
+.yes:
+    stc
     ret
 
-is_identifier_character:
+
+is_identifier_continue:
 
     call is_identifier_start
-
-    test eax, eax
-    jnz identifier_character_true
+    jc .yes
 
     cmp al, '0'
-    jb identifier_character_false
+    jb .no
 
     cmp al, '9'
-    ja identifier_character_false
+    ja .no
 
-identifier_character_true:
-
-    mov eax, 1
+.yes:
+    stc
     ret
 
-identifier_character_false:
+.no:
+    clc
+    ret
+
+
+keyword_lookup:
+
+    cmp rsi, 2
+    jne .k3
+
+    cmp byte [rdi], 'v'
+    jne .let
+
+    cmp byte [rdi + 1], 'a'
+    jne .let
+
+    cmp byte [rdi + 2], 'r'
+    je .var
+
+.let:
+    cmp byte [rdi], 'l'
+    jne .false
+
+    cmp byte [rdi + 1], 'e'
+    jne .false
+
+    cmp byte [rdi + 2], 't'
+    jne .false
+
+.var:
+    mov eax, KW_VAR
+    ret
+
+.k3:
+
+    cmp rsi, 3
+    jne .k4
+
+    cmp dword [rdi], 'f'
+    jne .if
+
+    cmp byte [rdi + 1], 'u'
+    jne .if
+
+    cmp byte [rdi + 2], 'n'
+    je .func
+
+.if:
+    cmp byte [rdi], 'i'
+    jne .else
+
+    cmp byte [rdi + 1], 'f'
+    je .kw_if
+
+.else:
+    cmp byte [rdi], 'f'
+    jne .nil
+
+    cmp byte [rdi + 1], 'o'
+    jne .nil
+
+    cmp byte [rdi + 2], 'r'
+    je .for
+
+.nil:
+    cmp byte [rdi], 'n'
+    jne .false
+
+    cmp byte [rdi + 1], 'i'
+    jne .false
+
+    cmp byte [rdi + 2], 'l'
+    je .nil_kw
+
+.false:
+    cmp byte [rdi], 'd'
+    jne .false2
+
+    cmp byte [rdi + 1], 'o'
+    jne .false2
+
+    cmp byte [rdi + 2], 'e'
+    jne .false2
+
+    mov eax, KW_DO
+    ret
+
+.false2:
+    xor eax, eax
+    ret
+
+.func:
+    mov eax, KW_FUNC
+    ret
+
+.kw_if:
+    mov eax, KW_IF
+    ret
+
+.for:
+    mov eax, KW_FOR
+    ret
+
+.nil_kw:
+    mov eax, KW_NIL
+    ret
+
+.k4:
+
+    cmp rsi, 4
+    jne .k5
+
+    cmp byte [rdi], 'e'
+    jne .true
+
+    cmp byte [rdi + 1], 'l'
+    jne .true
+
+    cmp byte [rdi + 2], 's'
+    jne .true
+
+    cmp byte [rdi + 3], 'e'
+    je .kw_else
+
+.true:
+    cmp dword [rdi], 'true'
+    je .kw_true
 
     xor eax, eax
     ret
 
-lookup_keyword:
-
-    push rbx
-    push rcx
-    push r8
-    push r9
-    push r10
-    push r11
-
-    xor rcx, rcx
-
-keyword_loop:
-
-    cmp rcx, 127
-    jae keyword_not_found
-
-    mov r8, rcx
-    imul r8, 24
-
-    lea r9, [keyword_table + r8]
-
-    mov r10, [r9]
-
-    cmp r10, rdx
-    jne keyword_next
-
-    mov r11, [r9 + 8]
-
-    xor r8, r8
-
-keyword_compare:
-
-    cmp r8, rdx
-    jae keyword_found
-
-    mov al, [rsi + r8]
-    mov ah, [r11 + r8]
-
-    cmp al, ah
-    jne keyword_next
-
-    inc r8
-    jmp keyword_compare
-
-keyword_found:
-
-    mov eax, [r9 + 16]
-
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rcx
-    pop rbx
-
+.kw_else:
+    mov eax, KW_ELSE
     ret
 
-keyword_next:
+.kw_true:
+    mov eax, KW_TRUE
+    ret
 
-    inc rcx
-    jmp keyword_loop
+.k5:
 
-keyword_not_found:
+    cmp rsi, 5
+    jne .k6
+
+    cmp dword [rdi], 'while'
+    je .kw_while
+
+    cmp dword [rdi], 'break'
+    je .kw_break
 
     xor eax, eax
-
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rcx
-    pop rbx
-
     ret
 
-section .data
+.kw_while:
+    mov eax, KW_WHILE
+    ret
 
-kw_var              db "var",0
-kw_let              db "let",0
-kw_mutable          db "mutable",0
-kw_immutable        db "immutable",0
-kw_if               db "if",0
-kw_else             db "else",0
-kw_while            db "while",0
-kw_do                db "do",0
-kw_for               db "for",0
-kw_in                db "in",0
-kw_break             db "break",0
-kw_continue          db "continue",0
-kw_return            db "return",0
-kw_function          db "function",0
-kw_struct            db "struct",0
-kw_class             db "class",0
-kw_enum              db "enum",0
-kw_protocol          db "protocol",0
-kw_extension         db "extension",0
-kw_import            db "import",0
-kw_public            db "public",0
-kw_private           db "private",0
-kw_internal          db "internal",0
-kw_fileprivate       db "fileprivate",0
-kw_static            db "static",0
-kw_final             db "final",0
-kw_open              db "open",0
-kw_override           db "override",0
-kw_init              db "init",0
-kw_deinit            db "deinit",0
-kw_self              db "self",0
-kw_super             db "super",0
-kw_true              db "true",0
-kw_false             db "false",0
-kw_nil               db "nil",0
-kw_as                db "as",0
-kw_is                db "is",0
-kw_type              db "type",0
-kw_protocols         db "protocols",0
-kw_generic           db "generic",0
-kw_where             db "where",0
-kw_associated        db "associated",0
-kw_requires          db "requires",0
-kw_throws            db "throws",0
-kw_rethrows          db "rethrows",0
-kw_try               db "try",0
-kw_catch             db "catch",0
-kw_throw             db "throw",0
-kw_defer             db "defer",0
-kw_guard             db "guard",0
-kw_switch            db "switch",0
-kw_case              db "case",0
-kw_default            db "default",0
-kw_fallthrough       db "fallthrough",0
-kw_repeat             db "repeat",0
-kw_match              db "match",0
-kw_async              db "async",0
-kw_await              db "await",0
-kw_actor              db "actor",0
-kw_task               db "task",0
-kw_send               db "send",0
-kw_receive            db "receive",0
-kw_move               db "move",0
-kw_copy               db "copy",0
-kw_reference          db "reference",0
-kw_pointer            db "pointer",0
-kw_address            db "address",0
-kw_dereference        db "dereference",0
-kw_operator           db "operator",0
-kw_precedence         db "precedence",0
-kw_associativity      db "associativity",0
-kw_inout              db "inout",0
-kw_variadic            db "variadic",0
-kw_extern              db "extern",0
-kw_inline              db "inline",0
-kw_volatile            db "volatile",0
-kw_unsafe              db "unsafe",0
-kw_asm                 db "asm",0
-kw_sizeof              db "sizeof",0
-kw_alignof             db "alignof",0
-kw_typeof              db "typeof",0
-kw_bitcast             db "bitcast",0
-kw_unreachable         db "unreachable",0
-kw_extern_c            db "extern_c",0
-kw_namespace           db "namespace",0
-kw_using               db "using",0
-kw_alias               db "alias",0
-kw_restrict            db "restrict",0
-kw_constexpr           db "constexpr",0
-kw_packed              db "packed",0
-kw_align               db "align",0
-kw_section             db "section",0
-kw_export              db "export",0
-kw_import_asm          db "import_asm",0
-kw_link                db "link",0
-kw_target              db "target",0
-kw_func                db "func",0
-kw_get                 db "get",0
-kw_set                 db "set",0
-kw_willset             db "willSet",0
-kw_didset              db "didSet",0
-kw_lazy                db "lazy",0
-kw_weak                db "weak",0
-kw_unowned             db "unowned",0
-kw_required            db "required",0
-kw_convenience         db "convenience",0
-kw_indirect            db "indirect",0
-kw_infix               db "infix",0
-kw_prefix              db "prefix",0
-kw_postfix             db "postfix",0
-kw_precedencegroup     db "precedencegroup",0
-kw_template            db "template",0
-kw_typename            db "typename",0
-kw_concept             db "concept",0
-kw_friend              db "friend",0
-kw_virtual             db "virtual",0
-kw_protected           db "protected",0
-kw_delete              db "delete",0
-kw_new                 db "new",0
-kw_this                db "this",0
-kw_nullptr              db "nullptr",0
-kw_static_assert       db "static_assert",0
-kw_noexcept            db "noexcept",0
-kw_threadlocal         db "threadlocal",0
-kw_synchronized        db "synchronized",0
-kw_yield               db "yield",0
-kw_typealias           db "typealias",0
+.kw_break:
+    mov eax, KW_BREAK
+    ret
 
-keyword_table:
+.k6:
 
-dq 3,  kw_var,             KW_VAR
-dq 3,  kw_let,             KW_LET
-dq 7,  kw_mutable,         KW_MUTABLE
-dq 9,  kw_immutable,       KW_IMMUTABLE
-dq 2,  kw_if,              KW_IF
-dq 4,  kw_else,            KW_ELSE
-dq 5,  kw_while,           KW_WHILE
-dq 2,  kw_do,               KW_DO
-dq 3,  kw_for,              KW_FOR
-dq 2,  kw_in,               KW_IN
-dq 5,  kw_break,            KW_BREAK
-dq 8,  kw_continue,         KW_CONTINUE
-dq 6,  kw_return,            KW_RETURN
-dq 8,  kw_function,         KW_FUNCTION
-dq 6,  kw_struct,           KW_STRUCT
-dq 5,  kw_class,            KW_CLASS
-dq 4,  kw_enum,             KW_ENUM
-dq 8,  kw_protocol,         KW_PROTOCOL
-dq 9,  kw_extension,        KW_EXTENSION
-dq 6,  kw_import,           KW_IMPORT
-dq 6,  kw_public,            KW_PUBLIC
-dq 7,  kw_private,           KW_PRIVATE
-dq 8,  kw_internal,          KW_INTERNAL
-dq 11, kw_fileprivate,       KW_FILEPRIVATE
-dq 6,  kw_static,            KW_STATIC
-dq 5,  kw_final,             KW_FINAL
-dq 4,  kw_open,              KW_OPEN
-dq 8,  kw_override,          KW_OVERRIDE
-dq 4,  kw_init,              KW_INIT
-dq 6,  kw_deinit,            KW_DEINIT
-dq 4,  kw_self,              KW_SELF
-dq 5,  kw_super,              KW_SUPER
-dq 4,  kw_true,               KW_TRUE
-dq 5,  kw_false,              KW_FALSE
-dq 3,  kw_nil,                KW_NIL
-dq 2,  kw_as,                 KW_AS
-dq 2,  kw_is,                 KW_IS
-dq 4,  kw_type,               KW_TYPE
-dq 9,  kw_protocols,          KW_PROTOCOLS
-dq 7,  kw_generic,            KW_GENERIC
-dq 5,  kw_where,              KW_WHERE
-dq 10, kw_associated,         KW_ASSOCIATED
-dq 8,  kw_requires,           KW_REQUIRES
-dq 6,  kw_throws,             KW_THROWS
-dq 8,  kw_rethrows,            KW_RETHROWS
-dq 3,  kw_try,                KW_TRY
-dq 5,  kw_catch,              KW_CATCH
-dq 5,  kw_throw,              KW_THROW
-dq 5,  kw_defer,              KW_DEFER
-dq 5,  kw_guard,              KW_GUARD
-dq 6,  kw_switch,             KW_SWITCH
-dq 4,  kw_case,               KW_CASE
-dq 7,  kw_default,            KW_DEFAULT
-dq 11, kw_fallthrough,        KW_FALLTHROUGH
-dq 6,  kw_repeat,             KW_REPEAT
-dq 5,  kw_match,              KW_MATCH
-dq 5,  kw_async,              KW_ASYNC
-dq 5,  kw_await,              KW_AWAIT
-dq 5,  kw_actor,              KW_ACTOR
-dq 4,  kw_task,               KW_TASK
-dq 4,  kw_send,               KW_SEND
-dq 7,  kw_receive,            KW_RECEIVE
-dq 4,  kw_move,               KW_MOVE
-dq 4,  kw_copy,               KW_COPY
-dq 9,  kw_reference,          KW_REFERENCE
-dq 7,  kw_pointer,            KW_POINTER
-dq 7,  kw_address,            KW_ADDRESS
-dq 11, kw_dereference,        KW_DEREFERENCE
-dq 8,  kw_operator,           KW_OPERATOR
-dq 10, kw_precedence,         KW_PRECEDENCE
-dq 12, kw_associativity,      KW_ASSOCIATIVITY
-dq 5,  kw_inout,              KW_INOUT
-dq 8,  kw_variadic,           KW_VARIADIC
-dq 6,  kw_extern,             KW_EXTERN
-dq 6,  kw_inline,             KW_INLINE
-dq 8,  kw_volatile,           KW_VOLATILE
-dq 6,  kw_unsafe,             KW_UNSAFE
-dq 3,  kw_asm,                KW_ASM
-dq 6,  kw_sizeof,             KW_SIZEOF
-dq 7,  kw_alignof,            KW_ALIGNOF
-dq 6,  kw_typeof,             KW_TYPEOF
-dq 7,  kw_bitcast,             KW_BITCAST
-dq 11, kw_unreachable,        KW_UNREACHABLE
-dq 8,  kw_extern_c,            KW_EXTERN_C
-dq 9,  kw_namespace,           KW_NAMESPACE
-dq 5,  kw_using,               KW_USING
-dq 5,  kw_alias,               KW_ALIAS
-dq 8,  kw_restrict,            KW_RESTRICT
-dq 9,  kw_constexpr,           KW_CONSTEXPR
-dq 6,  kw_packed,              KW_PACKED
-dq 5,  kw_align,               KW_ALIGN
-dq 7,  kw_section,             KW_SECTION
-dq 6,  kw_export,              KW_EXPORT
-dq 10, kw_import_asm,          KW_IMPORT_ASM
-dq 4,  kw_link,                KW_LINK
-dq 6,  kw_target,              KW_TARGET
-dq 4,  kw_func,                KW_FUNC
-dq 3,  kw_get,                 KW_GET
-dq 3,  kw_set,                 KW_SET
-dq 7,  kw_willset,             KW_WILLSET
-dq 6,  kw_didset,              KW_DIDSET
-dq 4,  kw_lazy,                KW_LAZY
-dq 4,  kw_weak,                KW_WEAK
-dq 7,  kw_unowned,             KW_UNOWNED
-dq 8,  kw_required,            KW_REQUIRED
-dq 12, kw_convenience,         KW_CONVENIENCE
-dq 8,  kw_indirect,            KW_INDIRECT
-dq 5,  kw_infix,               KW_INFIX
-dq 6,  kw_prefix,              KW_PREFIX
-dq 7,  kw_postfix,             KW_POSTFIX
-dq 15, kw_precedencegroup,     KW_PRECEDENCEGROUP
-dq 8,  kw_template,            KW_TEMPLATE
-dq 8,  kw_typename,            KW_TYPENAME
-dq 7,  kw_concept,             KW_CONCEPT
-dq 6,  kw_friend,              KW_FRIEND
-dq 7,  kw_virtual,             KW_VIRTUAL
-dq 9,  kw_protected,           KW_PROTECTED
-dq 6,  kw_delete,              KW_DELETE
-dq 3,  kw_new,                 KW_NEW
-dq 4,  kw_this,                KW_THIS
-dq 7,  kw_nullptr,             KW_NULLPTR
-dq 12, kw_static_assert,       KW_STATIC_ASSERT
-dq 7,  kw_noexcept,             KW_NOEXCEPT
-dq 10, kw_threadlocal,         KW_THREADLOCAL
-dq 12, kw_synchronized,        KW_SYNCHRONIZED
-dq 5,  kw_yield,               KW_YIELD
-dq 8,  kw_typealias,           KW_TYPEALIAS
+    cmp dword [rdi], 'return'
+    je .kw_return
 
-section .bss
+    cmp dword [rdi], 'struct'
+    je .kw_struct
 
-token_buffer:
-    resb 4194304
+    cmp dword [rdi], 'import'
+    je .kw_import
+
+    xor eax, eax
+    ret
+
+.kw_return:
+    mov eax, KW_RETURN
+    ret
+
+.kw_struct:
+    mov eax, KW_STRUCT
+    ret
+
+.kw_import:
+    mov eax, KW_IMPORT
+    ret
