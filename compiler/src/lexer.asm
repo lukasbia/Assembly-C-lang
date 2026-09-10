@@ -1,738 +1,705 @@
-%include "../include/tokens.inc"
-
-global asc_lexer_init
-global asc_lexer_next
-global asc_lexer_token_kind
-global asc_lexer_token_value
-
 section .data
-kw_as: db "as",0
-kw_associated: db "associated",0
-kw_break: db "break",0
-kw_case: db "case",0
-kw_catch: db "catch",0
-kw_class: db "class",0
-kw_continue: db "continue",0
-kw_defer: db "defer",0
-kw_default: db "default",0
-kw_do: db "do",0
-kw_else: db "else",0
-kw_enum: db "enum",0
-kw_extension: db "extension",0
-kw_false: db "false",0
-kw_final: db "final",0
-kw_for: db "for",0
-kw_func: db "func",0
-kw_if: db "if",0
-kw_import: db "import",0
-kw_in: db "in",0
-kw_init: db "init",0
-kw_let: db "let",0
-kw_mutating: db "mutating",0
-kw_nil: db "nil",0
-kw_protocol: db "protocol",0
-kw_repeat: db "repeat",0
-kw_return: db "return",0
-kw_self: db "self",0
-kw_static: db "static",0
-kw_struct: db "struct",0
-kw_subscript: db "subscript",0
-kw_super: db "super",0
-kw_switch: db "switch",0
-kw_throw: db "throw",0
-kw_true: db "true",0
-kw_try: db "try",0
-kw_typealias: db "typealias",0
-kw_var: db "var",0
-kw_while: db "while",0
-kw_where: db "where",0
-kw_guard: db "guard",0
-kw_open: db "open",0
-kw_private: db "private",0
-kw_public: db "public",0
-kw_internal: db "internal",0
-kw_fileprivate: db "fileprivate",0
-kw_package: db "package",0
-kw_readonly: db "readonly",0
-kw_weak: db "weak",0
-kw_unowned: db "unowned",0
-kw_owned: db "owned",0
-kw_move: db "move",0
-kw_copy: db "copy",0
-kw_inout: db "inout",0
-kw_requires: db "requires",0
-kw_precedence: db "precedence",0
-kw_operator: db "operator",0
-kw_prefix: db "prefix",0
-kw_postfix: db "postfix",0
-kw_infix: db "infix",0
-kw_async: db "async",0
-kw_await: db "await",0
-kw_actor: db "actor",0
-kw_sendable: db "sendable",0
-kw_isolated: db "isolated",0
-kw_nonisolated: db "nonisolated",0
-kw_macro: db "macro",0
-kw_result: db "result",0
-kw_yield: db "yield",0
-kw_accessor: db "accessor",0
-kw_get: db "get",0
-kw_set: db "set",0
-kw_willset: db "willset",0
-kw_didset: db "didset",0
-kw_read: db "read",0
-kw_modify: db "modify",0
-kw_convenience: db "convenience",0
-kw_required: db "required",0
-kw_override: db "override",0
-kw_dynamic: db "dynamic",0
-kw_finalize: db "finalize",0
-kw_unsafe: db "unsafe",0
-kw_safe: db "safe",0
-kw_atomic: db "atomic",0
-kw_volatile: db "volatile",0
-kw_inline: db "inline",0
-kw_noinline: db "noinline",0
-kw_extern: db "extern",0
-kw_cdecl: db "cdecl",0
-kw_system: db "system",0
-kw_foreign: db "foreign",0
-kw_module: db "module",0
-kw_namespace: db "namespace",0
-kw_using: db "using",0
-kw_include: db "include",0
-kw_export: db "export",0
-kw_link: db "link",0
-kw_target: db "target",0
-kw_arch: db "arch",0
-kw_cpu: db "cpu",0
-kw_abi: db "abi",0
-kw_asm: db "asm",0
-kw_vol: db "vol",0
-kw_byte: db "byte",0
-kw_word: db "word",0
-kw_dword: db "dword",0
-kw_qword: db "qword",0
-kw_i8: db "i8",0
-kw_i16: db "i16",0
-kw_i32: db "i32",0
-kw_i64: db "i64",0
-kw_u8: db "u8",0
-kw_u16: db "u16",0
-kw_u32: db "u32",0
-kw_u64: db "u64",0
-kw_f32: db "f32",0
-kw_f64: db "f64",0
-kw_bool: db "bool",0
-kw_char: db "char",0
-kw_string: db "string",0
-kw_void: db "void",0
-kw_any: db "any",0
-kw_never: db "never",0
-kw_some: db "some",0
-kw_somewhere: db "somewhere",0
-kw_throws: db "throws",0
-kw_rethrows: db "rethrows",0
+
+source db 'section .data {',10
+       db 'message = ("Hello, world!")',10
+       db 'account.balance = (1000)',10
+       db '}',10
+       db 'section .text {',10
+       db 'main {',10
+       db 'write.value.to.output (message)',10
+       db 'exit.program (0)',10
+       db '}',10
+       db '}',10
+       db 0
+
+kw_section db 'section',0
+kw_main db 'main',0
+kw_define db 'define',0
+kw_function db 'function',0
+kw_structure db 'structure',0
+kw_immutable db 'immutable',0
+kw_mutable db 'mutable',0
+kw_property db 'property',0
+kw_variable db 'variable',0
+kw_return db 'return',0
+kw_if db 'if',0
+kw_else db 'else',0
+kw_while db 'while',0
+kw_for db 'for',0
+kw_break db 'break',0
+kw_continue db 'continue',0
+kw_true db 'true',0
+kw_false db 'false',0
+kw_null db 'null',0
+kw_load db 'load',0
+kw_store db 'store',0
+kw_compare db 'compare',0
+kw_jump db 'jump',0
+kw_call db 'call',0
+kw_write db 'write.value.to.output',0
+kw_exit db 'exit.program',0
 
 section .bss
-lexer_ptr: resq 1
-lexer_end: resq 1
-token_kind: resq 1
-token_value: resq 1
-number_value: resq 1
-ident_buf: resb 256
+
+align 8
+token_types resq 4096
+token_values resq 4096
+token_count resq 1
+token_data resb 1048576
+token_data_used resq 1
+current_value resq 1
 
 section .text
-asc_lexer_init:
-    mov [lexer_ptr], rdi
-    mov [lexer_end], rsi
-    xor eax, eax
-    mov [token_kind], rax
-    mov [token_value], rax
-    ret
 
-asc_lexer_token_kind:
-    mov rax, [token_kind]
-    ret
+global lexer_tokenize
+global source
+global token_types
+global token_values
+global token_count
 
-asc_lexer_token_value:
-    mov rax, [token_value]
-    ret
+lexer_tokenize:
 
-asc_lexer_next:
-    push rbp
-    mov rbp, rsp
+    push rbx
+    push r12
+    push r13
 
-.skip:
-    mov rdi, [lexer_ptr]
-    cmp rdi, [lexer_end]
-    jae .eof
-    mov al, [rdi]
-    cmp al, ' '
-    je .space
-    cmp al, 9
-    je .space
-    cmp al, 10
-    je .space
-    cmp al, 13
-    je .space
-    cmp al, '/'
-    jne .not_comment
-    cmp rdi, [lexer_end]
-    jae .not_comment
-    cmp byte [rdi+1], '/'
-    jne .not_comment
-.comment:
-    inc rdi
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .eof
-    cmp byte [rdi], 10
-    jne .comment
-    mov [lexer_ptr], rdi
-    jmp .skip
+    xor r12,r12
+    mov [token_count],r12
+    mov [token_data_used],r12
+    mov rsi,source
 
-.space:
-    inc rdi
-    mov [lexer_ptr], rdi
-    jmp .skip
+.next:
 
-.not_comment:
-    cmp al, '0'
-    jb .not_number
-    cmp al, '9'
+    call skip_space
+
+    mov al,[rsi]
+    test al,al
+    jz .done
+
+    cmp al,'{'
+    je .left_brace
+
+    cmp al,'}'
+    je .right_brace
+
+    cmp al,'('
+    je .left_paren
+
+    cmp al,')'
+    je .right_paren
+
+    cmp al,'<'
+    je .left_angle
+
+    cmp al,'>'
+    je .right_angle
+
+    cmp al,'='
+    je .equal
+
+    cmp al,':'
+    je .colon
+
+    cmp al,','
+    je .comma
+
+    cmp al,'+'
+    je .plus
+
+    cmp al,'-'
+    je .minus
+
+    cmp al,'*'
+    je .multiply
+
+    cmp al,'/'
+    je .divide
+
+    cmp al,'!'
+    je .not
+
+    cmp al,'"'
+    je .string
+
+    cmp al,'0'
+    jb .identifier
+
+    cmp al,'9'
     jbe .number
 
-.not_number:
-    cmp al, '"'
-    je .string
-    cmp al, "'"
-    je .char
+.identifier:
 
-    cmp al, 'A'
-    jb .ident_lower
-    cmp al, 'Z'
-    ja .ident_lower
-    jmp .ident
-
-.ident_lower:
-    cmp al, '_'
-    je .ident
-    cmp al, 'a'
-    jb .operator
-    cmp al, 'z'
-    ja .operator
-
-.ident:
-    mov r8, rdi
-    xor rcx, rcx
-.ident_loop:
-    cmp rdi, [lexer_end]
-    jae .ident_done
-    mov al, [rdi]
-    cmp al, 'A'
-    jb .ident_check_lower
-    cmp al, 'Z'
-    jbe .ident_take
-.ident_check_lower:
-    cmp al, 'a'
-    jb .ident_check_digit
-    cmp al, 'z'
-    jbe .ident_take
-.ident_check_digit:
-    cmp al, '0'
-    jb .ident_check_us
-    cmp al, '9'
-    jbe .ident_take
-.ident_check_us:
-    cmp al, '_'
-    jne .ident_done
-.ident_take:
-    cmp rcx, 255
-    jae .ident_done
-    mov [ident_buf+rcx], al
-    inc rcx
-    inc rdi
-    jmp .ident_loop
-.ident_done:
-    mov byte [ident_buf+rcx], 0
-    mov [lexer_ptr], rdi
-    lea rsi, [ident_buf]
-    call asc_keyword_lookup
-    test eax, eax
-    jnz .keyword
-    mov qword [token_kind], TOK_IDENT
-    lea rax, [ident_buf]
-    mov [token_value], rax
-    jmp .done
-
-.keyword:
-    mov [token_kind], rax
-    lea rax, [ident_buf]
-    mov [token_value], rax
-    jmp .done
+    call read_identifier
+    call classify_identifier
+    jmp .next
 
 .number:
-    xor rax, rax
-.num_loop:
-    cmp rdi, [lexer_end]
-    jae .num_done
-    mov dl, [rdi]
-    cmp dl, '0'
-    jb .num_done
-    cmp dl, '9'
-    ja .num_done
-    imul rax, rax, 10
-    sub dl, '0'
-    movzx rdx, dl
-    add rax, rdx
-    inc rdi
-    jmp .num_loop
-.num_done:
-    mov [lexer_ptr], rdi
-    mov [number_value], rax
-    mov qword [token_kind], TOK_INT
-    mov [token_value], rax
-    jmp .done
+
+    call read_number
+
+    mov rdi,3
+    call emit_token
+
+    jmp .next
 
 .string:
-    inc rdi
-    mov r8, rdi
-    xor rcx, rcx
-.str_loop:
-    cmp rdi, [lexer_end]
-    jae .lex_error
-    mov al, [rdi]
-    cmp al, '"'
-    je .str_done
-    cmp rcx, 255
-    jae .lex_error
-    mov [ident_buf+rcx], al
-    inc rcx
-    inc rdi
-    jmp .str_loop
-.str_done:
-    mov byte [ident_buf+rcx], 0
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_STRING
-    lea rax, [ident_buf]
-    mov [token_value], rax
-    jmp .done
 
-.char:
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .lex_error
-    movzx eax, byte [rdi]
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .lex_error
-    cmp byte [rdi], "'"
-    jne .lex_error
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov [token_value], rax
-    mov qword [token_kind], TOK_CHAR
-    jmp .done
+    call read_string
 
-.operator:
-    cmp al, '+'
-    je .one_plus
-    cmp al, '-'
-    je .minus
-    cmp al, '*'
-    je .one_star
-    cmp al, '/'
-    je .one_slash
-    cmp al, '%'
-    je .one_percent
-    cmp al, '='
-    je .equals
-    cmp al, '!'
-    je .bang
-    cmp al, '<'
-    je .less
-    cmp al, '>'
-    je .greater
-    cmp al, '&'
-    je .amp
-    cmp al, '|'
-    je .pipe
-    cmp al, '('
-    je .simple_lp
-    cmp al, ')'
-    je .simple_rp
-    cmp al, '{'
-    je .simple_lb
-    cmp al, '}'
-    je .simple_rb
-    cmp al, '['
-    je .simple_lbr
-    cmp al, ']'
-    je .simple_rbr
-    cmp al, ':'
-    je .simple_colon
-    cmp al, ','
-    je .simple_comma
-    cmp al, '.'
-    je .simple_dot
-    cmp al, ';'
-    je .simple_semi
-    jmp .lex_error
+    mov rdi,4
+    call emit_token
 
-.one_plus:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_PLUS
-    jmp .done
+    jmp .next
+
+.left_brace:
+
+    inc rsi
+    mov rdi,5
+    call emit_empty
+    jmp .next
+
+.right_brace:
+
+    inc rsi
+    mov rdi,6
+    call emit_empty
+    jmp .next
+
+.left_paren:
+
+    inc rsi
+    mov rdi,7
+    call emit_empty
+    jmp .next
+
+.right_paren:
+
+    inc rsi
+    mov rdi,8
+    call emit_empty
+    jmp .next
+
+.left_angle:
+
+    inc rsi
+    mov rdi,9
+    call emit_empty
+    jmp .next
+
+.right_angle:
+
+    inc rsi
+    mov rdi,10
+    call emit_empty
+    jmp .next
+
+.equal:
+
+    inc rsi
+    mov rdi,11
+    call emit_empty
+    jmp .next
+
+.colon:
+
+    inc rsi
+    mov rdi,12
+    call emit_empty
+    jmp .next
+
+.comma:
+
+    inc rsi
+    mov rdi,13
+    call emit_empty
+    jmp .next
+
+.plus:
+
+    inc rsi
+    mov rdi,14
+    call emit_empty
+    jmp .next
+
 .minus:
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .minus_only
-    cmp byte [rdi], '>'
-    jne .minus_only
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_ARROW
-    jmp .done
-.minus_only:
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_MINUS
-    jmp .done
-.one_star:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_STAR
-    jmp .done
-.one_slash:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_SLASH
-    jmp .done
-.one_percent:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_PERCENT
-    jmp .done
-.equals:
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .assign
-    cmp byte [rdi], '='
-    jne .assign
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_EQ
-    jmp .done
-.assign:
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_ASSIGN
-    jmp .done
-.bang:
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .not_only
-    cmp byte [rdi], '='
-    jne .not_only
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_NE
-    jmp .done
-.not_only:
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_NOT
-    jmp .done
-.less:
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .less_only
-    cmp byte [rdi], '='
-    je .le
-    cmp byte [rdi], '<'
-    je .shl
-.less_only:
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_LT
-    jmp .done
-.le:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_LE
-    jmp .done
-.shl:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_SHL
-    jmp .done
-.greater:
-    inc rdi
-    cmp rdi, [lexer_end]
-    jae .greater_only
-    cmp byte [rdi], '='
-    je .ge
-    cmp byte [rdi], '>'
-    je .shr
-.greater_only:
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_GT
-    jmp .done
-.ge:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_GE
-    jmp .done
-.shr:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_SHR
-    jmp .done
-.amp:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_BITAND
-    jmp .done
-.pipe:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_BITOR
-    jmp .done
 
-.simple_lp:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_LPAREN
-    jmp .done
-.simple_rp:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_RPAREN
-    jmp .done
-.simple_lb:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_LBRACE
-    jmp .done
-.simple_rb:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_RBRACE
-    jmp .done
-.simple_lbr:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_LBRACKET
-    jmp .done
-.simple_rbr:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_RBRACKET
-    jmp .done
-.simple_colon:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_COLON
-    jmp .done
-.simple_comma:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_COMMA
-    jmp .done
-.simple_dot:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_DOT
-    jmp .done
-.simple_semi:
-    inc rdi
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_SEMI
-    jmp .done
+    inc rsi
+    mov rdi,15
+    call emit_empty
+    jmp .next
 
-.eof:
-    mov [lexer_ptr], rdi
-    mov qword [token_kind], TOK_EOF
-    xor eax, eax
-    mov [token_value], rax
-    jmp .done
+.multiply:
 
-.lex_error:
-    mov qword [token_kind], -1
-    mov qword [token_value], 0
+    inc rsi
+    mov rdi,16
+    call emit_empty
+    jmp .next
+
+.divide:
+
+    inc rsi
+    mov rdi,17
+    call emit_empty
+    jmp .next
+
+.not:
+
+    inc rsi
+
+    cmp byte [rsi],'='
+    je .not_equal
+
+    mov rdi,18
+    call emit_empty
+
+    jmp .next
+
+.not_equal:
+
+    inc rsi
+    mov rdi,19
+    call emit_empty
+
+    jmp .next
 
 .done:
-    mov rax, [token_kind]
-    pop rbp
+
+    mov rdi,0
+    call emit_empty
+
+    xor rax,rax
+
+    pop r13
+    pop r12
+    pop rbx
+
     ret
 
-asc_keyword_lookup:
-    push rbx
-    push rcx
-    push rdx
+skip_space:
+
+.loop:
+
+    mov al,[rsi]
+
+    cmp al,' '
+    je .skip
+
+    cmp al,10
+    je .skip
+
+    cmp al,9
+    je .skip
+
+    cmp al,13
+    je .skip
+
+    ret
+
+.skip:
+
+    inc rsi
+    jmp .loop
+
+read_identifier:
+
+    mov rax,[token_data_used]
+
+    mov [current_value],rax
+
+    mov rdi,token_data
+    add rdi,rax
+
+    xor rcx,rcx
+
+.loop:
+
+    mov al,[rsi]
+
+    test al,al
+    jz .done
+
+    cmp al,' '
+    je .done
+
+    cmp al,10
+    je .done
+
+    cmp al,9
+    je .done
+
+    cmp al,13
+    je .done
+
+    cmp al,'{'
+    je .done
+
+    cmp al,'}'
+    je .done
+
+    cmp al,'('
+    je .done
+
+    cmp al,')'
+    je .done
+
+    cmp al,'<'
+    je .done
+
+    cmp al,'>'
+    je .done
+
+    cmp al,'='
+    je .done
+
+    cmp al,':'
+    je .done
+
+    cmp al,','
+    je .done
+
+    cmp al,'+'
+    je .done
+
+    cmp al,'-'
+    je .done
+
+    cmp al,'*'
+    je .done
+
+    cmp al,'/'
+    je .done
+
+    cmp al,'!'
+    je .done
+
+    mov [rdi+rcx],al
+
+    inc rcx
+    inc rsi
+
+    cmp rcx,1023
+    jb .loop
+
+.done:
+
+    mov byte [rdi+rcx],0
+
+    mov rax,[token_data_used]
+    add rax,rcx
+    inc rax
+
+    mov [token_data_used],rax
+
+    ret
+
+read_number:
+
+    mov rax,[token_data_used]
+
+    mov [current_value],rax
+
+    mov rdi,token_data
+    add rdi,rax
+
+    xor rcx,rcx
+
+.loop:
+
+    mov al,[rsi]
+
+    cmp al,'0'
+    jb .done
+
+    cmp al,'9'
+    ja .done
+
+    mov [rdi+rcx],al
+
+    inc rcx
+    inc rsi
+
+    cmp rcx,1023
+    jb .loop
+
+.done:
+
+    mov byte [rdi+rcx],0
+
+    mov rax,[token_data_used]
+    add rax,rcx
+    inc rax
+
+    mov [token_data_used],rax
+
+    ret
+
+read_string:
+
+    inc rsi
+
+    mov rax,[token_data_used]
+
+    mov [current_value],rax
+
+    mov rdi,token_data
+    add rdi,rax
+
+    xor rcx,rcx
+
+.loop:
+
+    mov al,[rsi]
+
+    test al,al
+    jz .done
+
+    cmp al,'"'
+    je .closed
+
+    cmp al,'\'
+    jne .copy
+
+    inc rsi
+
+    mov al,[rsi]
+
+    test al,al
+    jz .done
+
+.copy:
+
+    mov [rdi+rcx],al
+
+    inc rcx
+    inc rsi
+
+    cmp rcx,1023
+    jb .loop
+
+.closed:
+
+    inc rsi
+
+.done:
+
+    mov byte [rdi+rcx],0
+
+    mov rax,[token_data_used]
+    add rax,rcx
+    inc rax
+
+    mov [token_data_used],rax
+
+    ret
+
+classify_identifier:
+
+    push rsi
+
+    mov rdi,kw_section
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_main
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_define
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_function
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_structure
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_immutable
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_mutable
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_property
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_variable
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_return
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_if
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_else
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_while
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_for
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_break
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_continue
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_true
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_false
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_null
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_load
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_store
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_compare
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_jump
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_call
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_write
+    call equal_token
+    jc .keyword
+
+    mov rdi,kw_exit
+    call equal_token
+    jc .keyword
+
+    pop rsi
+
+    mov rdi,2
+    call emit_token
+
+    ret
+
+.keyword:
+
+    pop rsi
+
+    mov rdi,1
+    call emit_token
+
+    ret
+
+equal_token:
+
     push rsi
     push rdi
+    push rax
 
-    mov rbx, rsi
-    lea rsi, [kw_table]
 .loop:
-    mov rdi, [rsi]
-    test rdi, rdi
-    jz .no
-    mov rdx, rbx
-    mov rcx, rdi
-.cmp:
-    mov al, [rdx]
-    mov ah, [rcx]
-    cmp al, ah
-    jne .next
-    test al, al
-    jz .match
-    inc rdx
-    inc rcx
-    jmp .cmp
-.next:
-    add rsi, 16
+
+    mov al,[rsi]
+
+    cmp al,[rdi]
+    jne .no
+
+    test al,al
+    jz .yes
+
+    inc rsi
+    inc rdi
+
     jmp .loop
-.match:
-    mov eax, [rsi+8]
-    jmp .out
-.no:
-    xor eax, eax
-.out:
+
+.yes:
+
+    pop rax
     pop rdi
     pop rsi
-    pop rdx
-    pop rcx
-    pop rbx
+
+    stc
     ret
 
-section .data
-kw_table:
-    dq kw_as,          KW_AS
-    dq kw_associated,  KW_ASSOCIATED
-    dq kw_break,       KW_BREAK
-    dq kw_case,        KW_CASE
-    dq kw_catch,       KW_CATCH
-    dq kw_class,       KW_CLASS
-    dq kw_continue,    KW_CONTINUE
-    dq kw_defer,       KW_DEFER
-    dq kw_default,     KW_DEFAULT
-    dq kw_do,          KW_DO
-    dq kw_else,        KW_ELSE
-    dq kw_enum,        KW_ENUM
-    dq kw_extension,   KW_EXTENSION
-    dq kw_false,       KW_FALSE
-    dq kw_final,       KW_FINAL
-    dq kw_for,         KW_FOR
-    dq kw_func,        KW_FUNC
-    dq kw_if,          KW_IF
-    dq kw_import,      KW_IMPORT
-    dq kw_in,          KW_IN
-    dq kw_init,        KW_INIT
-    dq kw_let,         KW_LET
-    dq kw_mutating,    KW_MUTATING
-    dq kw_nil,         KW_NIL
-    dq kw_protocol,    KW_PROTOCOL
-    dq kw_repeat,      KW_REPEAT
-    dq kw_return,      KW_RETURN
-    dq kw_self,        KW_SELF
-    dq kw_static,      KW_STATIC
-    dq kw_struct,      KW_STRUCT
-    dq kw_subscript,   KW_SUBSCRIPT
-    dq kw_super,       KW_SUPER
-    dq kw_switch,      KW_SWITCH
-    dq kw_throw,       KW_THROW
-    dq kw_true,        KW_TRUE
-    dq kw_try,         KW_TRY
-    dq kw_typealias,   KW_TYPEALIAS
-    dq kw_var,         KW_VAR
-    dq kw_while,       KW_WHILE
-    dq kw_where,       KW_WHERE
-    dq kw_guard,       KW_GUARD
-    dq kw_open,        KW_OPEN
-    dq kw_private,     KW_PRIVATE
-    dq kw_public,      KW_PUBLIC
-    dq kw_internal,    KW_INTERNAL
-    dq kw_fileprivate, KW_FILEPRIVATE
-    dq kw_package,     KW_PACKAGE
-    dq kw_readonly,    KW_READONLY
-    dq kw_weak,        KW_WEAK
-    dq kw_unowned,     KW_UNOWNED
-    dq kw_owned,       KW_OWNED
-    dq kw_move,        KW_MOVE
-    dq kw_copy,        KW_COPY
-    dq kw_inout,       KW_INOUT
-    dq kw_requires,    KW_REQUIRES
-    dq kw_precedence,  KW_PRECEDENCE
-    dq kw_operator,    KW_OPERATOR
-    dq kw_prefix,      KW_PREFIX
-    dq kw_postfix,     KW_POSTFIX
-    dq kw_infix,       KW_INFIX
-    dq kw_async,       KW_ASYNC
-    dq kw_await,       KW_AWAIT
-    dq kw_actor,       KW_ACTOR
-    dq kw_sendable,    KW_SENDABLE
-    dq kw_isolated,    KW_ISOLATED
-    dq kw_nonisolated, KW_NONISOLATED
-    dq kw_macro,       KW_MACRO
-    dq kw_result,      KW_RESULT
-    dq kw_yield,       KW_YIELD
-    dq kw_accessor,    KW_ACCESSOR
-    dq kw_get,         KW_GET
-    dq kw_set,         KW_SET
-    dq kw_willset,     KW_WILLSET
-    dq kw_didset,      KW_DIDSET
-    dq kw_read,        KW_READ
-    dq kw_modify,      KW_MODIFY
-    dq kw_convenience, KW_CONVENIENCE
-    dq kw_required,    KW_REQUIRED
-    dq kw_override,    KW_OVERRIDE
-    dq kw_dynamic,     KW_DYNAMIC
-    dq kw_finalize,    KW_FINALIZE
-    dq kw_unsafe,      KW_UNSAFE
-    dq kw_safe,        KW_SAFE
-    dq kw_atomic,      KW_ATOMIC
-    dq kw_volatile,    KW_VOLATILE
-    dq kw_inline,      KW_INLINE
-    dq kw_noinline,    KW_NOINLINE
-    dq kw_extern,      KW_EXTERN
-    dq kw_cdecl,       KW_CDECL
-    dq kw_system,      KW_SYSTEM
-    dq kw_foreign,     KW_FOREIGN
-    dq kw_module,      KW_MODULE
-    dq kw_namespace,   KW_NAMESPACE
-    dq kw_using,       KW_USING
-    dq kw_include,     KW_INCLUDE
-    dq kw_export,      KW_EXPORT
-    dq kw_link,        KW_LINK
-    dq kw_target,      KW_TARGET
-    dq kw_arch,        KW_ARCH
-    dq kw_cpu,         KW_CPU
-    dq kw_abi,         KW_ABI
-    dq kw_asm,         KW_ASM
-    dq kw_vol,         KW_VOL
-    dq kw_byte,        KW_BYTE
-    dq kw_word,        KW_WORD
-    dq kw_dword,       KW_DWORD
-    dq kw_qword,       KW_QWORD
-    dq kw_i8,          KW_I8
-    dq kw_i16,         KW_I16
-    dq kw_i32,         KW_I32
-    dq kw_i64,         KW_I64
-    dq kw_u8,           KW_U8
-    dq kw_u16,          KW_U16
-    dq kw_u32,          KW_U32
-    dq kw_u64,          KW_U64
-    dq kw_f32,          KW_F32
-    dq kw_f64,          KW_F64
-    dq kw_bool,         KW_BOOL
-    dq kw_char,         KW_CHAR
-    dq kw_string,       KW_STRING
-    dq kw_void,         KW_VOID
-    dq kw_any,          KW_ANY
-    dq kw_never,        KW_NEVER
-    dq kw_some,         KW_SOME
-    dq kw_somewhere,    KW_SOMEWHERE
-    dq kw_throws,       KW_THROWS
-    dq kw_rethrows,     KW_RETHROWS
-    dq 0, 0
+.no:
+
+    pop rax
+    pop rdi
+    pop rsi
+
+    clc
+    ret
+
+emit_token:
+
+    push rax
+    push rbx
+    push rcx
+
+    mov rax,[token_count]
+    mov rbx,rax
+
+    mov [token_types+rbx*8],rdi
+
+    mov rax,[current_value]
+
+    mov rcx,token_data
+    add rax,rcx
+
+    mov [token_values+rbx*8],rax
+
+    mov rax,[token_count]
+    inc rax
+
+    mov [token_count],rax
+
+    pop rcx
+    pop rbx
+    pop rax
+
+    ret
+
+emit_empty:
+
+    push rax
+    push rbx
+
+    mov rax,[token_count]
+    mov rbx,rax
+
+    mov [token_types+rbx*8],rdi
+    mov qword [token_values+rbx*8],0
+
+    inc rax
+
+    mov [token_count],rax
+
+    pop rbx
+    pop rax
+
+    ret
